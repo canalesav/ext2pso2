@@ -314,19 +314,80 @@ public class bits {
     }
     public Date convertIntToDate(Integer intDate) {
 
-    if (intDate < 100000 || intDate > 999999) {
-        //log.warn("Unable to parse int date {}", intDate);
-        return null;
+        if (intDate < 100000 || intDate > 999999) {
+            //log.warn("Unable to parse int date {}", intDate);
+            return null;
+        }
+
+        int intYear = intDate/100;
+        int intMonth = intDate - (intYear * 100);
+
+        Calendar result = new GregorianCalendar();
+        result.set(intYear, intMonth - 1, 1, 0, 0, 0);
+
+        return result.getTime();
     }
 
-    int intYear = intDate/100;
-    int intMonth = intDate - (intYear * 100);
-
-    Calendar result = new GregorianCalendar();
-    result.set(intYear, intMonth - 1, 1, 0, 0, 0);
-
-    return result.getTime();
-}
-    
+    public String[] cd(long bloque,String nombre)throws FileNotFoundException, IOException{
+        Inodo inodo = new Inodo();
+        String[] respuesta= new String[3];
+        
+        archivo = new RandomAccessFile("disco.bin", "rw");
+        archivo.seek(bloque*4096);
+        int id = archivo.readInt();
+        int tamn = archivo.readInt();
+        long tam = archivo.readLong();
+        String nom = archivo.readUTF();
+        while(tam > 0){
+            if(nombre.equals(nom)){
+                archivo.close();
+                inodo = this.getInodo(id);
+                respuesta[0] = nombre;
+                respuesta[1] = String.valueOf(id);
+                respuesta[2] = String.valueOf(inodo.getI_blocks1());
+                archivo.close();
+                return respuesta;
+            }
+            id=archivo.readInt();
+            archivo.readInt();
+            tam = archivo.readLong();
+            nom = archivo.readUTF();
+        }
+        archivo.close();
+        
+        
+        respuesta[0] ="ni siquiera lo busca";
+        return respuesta;
+    }
+    public void rmdir(long bloque,String nombre)throws FileNotFoundException, IOException{
+        Inodo inodo = new Inodo();
+        String respuesta= "a";
+        
+        archivo = new RandomAccessFile("disco.bin", "rw");
+        archivo.seek(bloque*4096);
+        int id = archivo.readInt();
+        int tamn = archivo.readInt();
+        long tam = archivo.readLong();
+        String nom = archivo.readUTF();
+        while(tam > 0){
+            if(nombre.equals(nom)){
+                long posicion = archivo.getFilePointer()-tam;
+                archivo.seek(posicion);
+                archivo.writeInt(0);
+                archivo.writeInt(0);
+                archivo.writeLong(0);
+                for(int i = 0;i<tamn-1;i++){
+                    respuesta = respuesta+"a";
+                }
+                archivo.writeUTF(respuesta);
+                archivo.seek(posicion);
+            }
+            id=archivo.readInt();
+            tamn = archivo.readInt();
+            tam = archivo.readLong();
+            nom = archivo.readUTF();
+        }
+        archivo.close();
+    }
     
 }
