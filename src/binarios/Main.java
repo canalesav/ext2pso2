@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 
 public class Main {
-    private static bits b = new bits();
+   private static bits b = new bits();
     private static long bloqueActual = 37;
     private static long inodoActual = 0;
     private static ArrayList<Long> bloquesAnteriores = new ArrayList();
@@ -46,7 +46,43 @@ public class Main {
                     if(Comando[0].equals("mkdir")){
                         b.mkdir(bloqueActual, Comando[1]);
                     }
-                    
+                    if(Comando[0].equals("cd")){
+                        String[] r =b.cd(bloqueActual, Comando[1]);
+                        if(r[0].equals(Comando[1])){
+                            currentPath.add(Comando[1]);
+                            InodosAnteriores.add(inodoActual);
+                            inodoActual=Long.parseLong(r[1]);
+                            bloquesAnteriores.add(bloqueActual);
+                            System.out.println(Long.parseLong(r[2]));
+                            bloqueActual = Long.parseLong(r[2]);
+                        }else{
+                            if(Comando[1].equals("..")){
+                                inodoActual = InodosAnteriores.get(InodosAnteriores.size()-1);
+                                InodosAnteriores.remove(InodosAnteriores.size()-1);
+                                bloqueActual = bloquesAnteriores.get(bloquesAnteriores.size()-1);
+                                bloquesAnteriores.remove(bloquesAnteriores.size()-1);
+                                currentPath.remove(currentPath.size()-1);
+                            }else{
+                                System.out.println(r[0]);
+                            }
+                        }
+                    }
+                    if(Comando[0].equals("rmdir")){
+                        b.rmdir(bloqueActual, Comando[1]);
+                    }
+                    if(Comando[0].equals("vim")){
+                        leer = new Scanner(System.in);
+                     entrada = leer.nextLine();
+                        b.vim(bloqueActual, Comando[1], entrada);
+                    }
+                    if(Comando[0].equals("cat")){
+                        if(Comando.length == 3){
+                            System.out.println(b.cat(Comando[1], bloqueActual));
+                            System.out.println(b.cat(Comando[2], bloqueActual));
+                        }else{
+                            System.out.println(b.cat(Comando[1], bloqueActual));
+                        }
+                    }
             
             }while(centinela);
     }

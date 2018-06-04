@@ -65,7 +65,7 @@ public class DirectoryEntrie {
                 }
             }
         }*/
-        return null;
+  //      return null;
     }
 
     public void getBlockContaining(String name) {
@@ -76,7 +76,7 @@ public class DirectoryEntrie {
                 }
             }
         }*/
-        return null;
+     //   return null;
     }
 
     // Returns the inode number of the "." dir_entry of this directory (self reference)
