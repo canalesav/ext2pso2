@@ -57,7 +57,45 @@ public class DirectoryEntrie {
         this.name = name;
     }
     
-    
+    public void findEntry(String name) {
+        /*for (Bloque_Directorio block : this) {
+            for (Entrada_Directorio dirEntry : block) {
+                if (dirEntry.getFilename().equals(name)) {
+                    return dirEntry;
+                }
+            }
+        }*/
+        return null;
+    }
+
+    public void getBlockContaining(String name) {
+        /*for (Bloque_Directorio block : this) {
+            for (Entrada_Directorio entry : block) {
+                if (entry.getFilename().equals(name)) {
+                    return block;
+                }
+            }
+        }*/
+        return null;
+    }
+
+    // Returns the inode number of the "." dir_entry of this directory (self reference)
+    public void getInode() {
+        /*Bloque_Directorio firstBlock = this.get(0);
+        Entrada_Directorio self = firstBlock.get(0);
+        return self.getInode();*/
+    }
+
+    // Returns the inode number of the ".." dir_entry of this directory (parent reference)
+    public void getParentInode() {
+        /*Bloque_Directorio firstBlock = this.get(0);
+        Entrada_Directorio parent = firstBlock.get(1);
+        return parent.getInode();*/
+    }
+
+    public void getLastBlock() {
+        /*return get(size() - 1);*/
+    }
     
     
     
