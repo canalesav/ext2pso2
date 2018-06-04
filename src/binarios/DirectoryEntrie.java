@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package proyectoso2;
+package binarios;
 
 /**
  *
  * @author Karlos
  */
 public class DirectoryEntrie {
+    private long rec_len;
     private int inodo;
     private int n_len;
-    private long rec_len;
     private String name;
 
     public DirectoryEntrie() {
     }
 
-    public DirectoryEntrie(int inodo, int n_len,long rec_len, String name) {
+    public DirectoryEntrie(int inodo, String name) {
         this.inodo = inodo;
-        this.rec_len = rec_len+2;
-        this.n_len = n_len;
+        this.rec_len = 18+name.length();
+        this.n_len = name.length();
         this.name = name;
     }
 
