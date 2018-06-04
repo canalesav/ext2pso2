@@ -5,6 +5,8 @@
  */
 package proyectoso2;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
 
 /**
@@ -44,5 +46,20 @@ public class BitMap_Inodo implements Serializable{
     }
     public boolean getBitMapINODO(int id){
         return this.bitmapInodo[id];
+    }
+    public boolean[] getBitMapINODOs(){
+        return this.bitmapInodo;
+    }
+    
+    public void write(RandomAccessFile raf) throws IOException {
+        for (int i = 0; i < this.bitmapInodo.length; i++) {
+            raf.writeBoolean(this.bitmapInodo[i]);
+        }
+    }
+    
+    public void read(RandomAccessFile raf) throws IOException {
+        for (int i = 0; i < this.bitmapInodo.length; i++) {
+            this.bitmapInodo[i] = raf.readBoolean();
+        }
     }
 }

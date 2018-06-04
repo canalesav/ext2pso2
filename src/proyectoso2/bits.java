@@ -66,14 +66,26 @@ public class bits {
             System.out.println(ex);
         }
     }
-    public void guardaCambiosEstructura() throws FileNotFoundException, IOException{
-        ObjectOutputStream file = new ObjectOutputStream(new FileOutputStream( "disco.bin",true ));
-            //Se escribe el objeto en archivo
-            file.writeObject(bloque);
-            file.writeObject(inodo);
-            file.writeObject(inodoTabla);
+    public void guardaCambiosEstructura() throws FileNotFoundException, IOException, ClassNotFoundException{
+        //Se escribe el objeto en archivo
+        FileInputStream istream = new FileInputStream("disco.bin");
+        ObjectInputStream fileRead = new ObjectInputStream(new FileInputStream( "disco.bin" ));
+        BitMapBLOCK bloque = (BitMapBLOCK) fileRead.readObject();
+        BitMap_Inodo inodo = (BitMap_Inodo) fileRead.readObject();
+        tabla_Inodo inodoTabla = (tabla_Inodo) fileRead.readObject();
+        ArrayList objetos = new ArrayList();
+        while(fileRead.available()>1)
+            objetos.add(fileRead.read());
             //se cierra archivo
-            file.close();
+        ObjectOutputStream file = new ObjectOutputStream(new FileOutputStream( "disco.bin" ));
+        file.writeObject(bloque);
+        file.writeObject(inodo);
+        file.writeObject(inodoTabla);
+        for (int i = 0; i < objetos.size(); i++) {
+            file.write(((int)objetos.get(i)));
+        }
+        fileRead.close();
+        file.close();
     }
 
     public void leer()
@@ -220,7 +232,11 @@ public class bits {
             String nombre = "fff";
             long pos = (bloque*4096);
             long cent =0;
+            int cont = 0;
+            System.out.println("Lee");
+            System.out.println("bloque="+bloque);
             do{
+                System.out.println("pos="+pos);
                 archivo.seek(pos);
                 idi = archivo.readInt();
                 recl = archivo.readInt();
@@ -232,7 +248,8 @@ public class bits {
                 }
                 pos+=tamb;
                 cent+=8;
-            }while(pos < (bloque*4096)+4096 && cent < 4096);
+                cont++;
+            }while(pos < (bloque*4096)+4096 && cent < 4096 && cont<10);
             archivo.close();
             return tabla;
     }
@@ -246,14 +263,27 @@ public class bits {
             
             int pos =  bloque*4096;
             int centinela = 0;
+            System.out.println("Escribe");
+            System.out.println("bloque="+bloque);
             do{
+                System.out.println("pos="+pos);
                 archivo.seek(pos);
                 idi = archivo.readInt();
                 recl = archivo.readInt();
                 tamb = archivo.readLong();
                 nombre = archivo.readUTF();
+                System.out.println("idi="+idi);
+                System.out.println("recl="+recl);
+                System.out.println("tamb="+tamb);
+                System.out.println("nombre="+nombre);
                 
                 if( tamb == 0 && pos < (bloque*4096)+4096){
+                    System.out.println("/88888888 - Escribio - 88888888/");
+                    System.out.println("pos="+pos);
+                    System.out.println("idi="+idi);
+                    System.out.println("recl="+recl);
+                    System.out.println("tamb="+tamb);
+                    System.out.println("nombre="+nombre);
                     
                     archivo.seek(pos);
                     idi = dirEntrie.getInodo();
@@ -273,6 +303,72 @@ public class bits {
             }while(centinela < 4096);
             archivo.close();
             return false;
+    }
+    public ArrayList<DirectoryEntrie> buscarDirEntrie(String name) throws FileNotFoundException, IOException{
+        archivo = new RandomAccessFile("disco.bin", "rw");
+            //archivo.seek((bloque*4096));
+            ArrayList<DirectoryEntrie> tabla = new ArrayList();
+            int idi;
+            int recl;
+            long tamb;
+            String nombre = "fff";
+            long pos = (34*4096);
+            long cent =0;
+            do{
+                archivo.seek(pos);
+                idi = archivo.readInt();
+                recl = archivo.readInt();
+                tamb = archivo.readLong();
+                nombre = archivo.readUTF();
+                
+                if(nombre.equals(name)){
+                    System.out.println("name = "+name +"\tnombre = "+nombre);
+                    System.out.println("pos = "+pos);
+                    tabla.add(new DirectoryEntrie(idi,recl,tamb,nombre));
+                }
+                pos+=tamb;
+                cent+=8;
+            }while(pos < (34*4096)+4096 && cent < 4096);
+            archivo.close();
+            return tabla;
+    }
+    public boolean borraBloqueDirEntrie(int bloque, DirectoryEntrie dirEntrie) throws FileNotFoundException, IOException{
+        archivo = new RandomAccessFile("disco.bin", "rw");
+            
+        int idi;
+        int recl;
+        long tamb;
+        String nombre = "fff";
+
+        int pos =  bloque*4096;
+        int centinela = 0;
+        do{
+            archivo.seek(pos);
+            idi = archivo.readInt();
+            recl = archivo.readInt();
+            tamb = archivo.readLong();
+            nombre = archivo.readUTF();
+
+            if( tamb == 0 && pos < (bloque*4096)+4096){
+
+                archivo.seek(pos);
+                idi = dirEntrie.getInodo();
+                recl = dirEntrie.getN_len();
+                tamb = dirEntrie.getRec_len();
+                nombre = dirEntrie.getName();
+
+                archivo.writeInt(idi);
+                archivo.writeInt(recl);
+                archivo.writeLong(tamb);
+                archivo.writeUTF(nombre);
+
+                return true;
+            }
+            pos+=tamb; 
+            centinela+=8;
+        }while(centinela < 4096);
+        archivo.close();
+        return false;
     }
     public BitMapBLOCK getBMBloque() {
         return bloque;
